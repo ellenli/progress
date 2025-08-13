@@ -15,7 +15,7 @@
     }
     a { color:var(--accent); text-decoration:none }
     a:hover { text-decoration:underline }
-    main { max-width:820px; margin:0 auto; padding:3rem 1rem }
+    main { max-width:900px; margin:0 auto; padding:3rem 1rem }
     h1 {
       margin:0 0 1rem;
       font-size:1.6rem;
@@ -70,11 +70,20 @@
     The PRG is a multidisciplinary reading group led by 
     <a href="https://x.com/_benjaminparry/status/1905297341705281898" target="_blank" rel="noopener">Benjamin Parry</a> 
     and <a href="https://www.linkedin.com/in/mixue/" target="_blank" rel="noopener">Michelle Jia</a>. 
-    We read influential papers from many academic fields, and investigate them from the lens of progress. We meet weekly, in person, in Toronto.
+    We read influential papers from many academic fields, and investigate them from the lens of progress. We meet every week, in person, in Toronto.
   </p>
-  <p class="meta">Here are the <span id="file-count"></span> papers we’ve read so far. Click the icon to download the PDF.</p>
+  <p class="meta">
+    Here are the <span id="file-count"></span> papers we’ve read so far. Click 
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" 
+         fill="currentColor" width="1.2em" height="1.2em" 
+         style="vertical-align:middle; color:var(--accent); margin-top: -0.3em">
+      <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" />
+      <path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" />
+    </svg>
+    to download the PDF.
+  </p>
   <ul id="list" aria-live="polite"></ul>
-  <p class="meta">Last updated <span id="last-updated">—</span> via <a href="https://github.com/ellenli/progress" target="_blank" rel="noopener">GitHub</a>.</p>
+  <p class="meta">Last updated <span id="last-updated"></span> via <a href="https://github.com/ellenli/progress" target="_blank" rel="noopener">GitHub</a>.</p>
 </main>
 
 <script>
