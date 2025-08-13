@@ -70,7 +70,7 @@
     The PRG is a multidisciplinary reading group led by 
     <a href="https://x.com/_benjaminparry/status/1905297341705281898" target="_blank" rel="noopener">Benjamin Parry</a> 
     and <a href="https://www.linkedin.com/in/mixue/" target="_blank" rel="noopener">Michelle Jia</a>. 
-    We discuss foundational and influential papers relating to progress. We meet weekly, in person, in Toronto.
+    We read influential papers from many academic fields, and investigate them from the lens of progress. We meet weekly, in person, in Toronto.
   </p>
   <p class="meta">Here are the <span id="file-count"></span> papers we’ve read so far. Click the icon to download the PDF.</p>
   <ul id="list" aria-live="polite"></ul>
@@ -127,11 +127,11 @@
     list.innerHTML = items.map(f => {
       const parsed = parseFileName(f.name);
       if (!parsed) return '';
-      return `<li class="row" data-href="${f.raw}" role="link" tabindex="0" aria-label="Open ${parsed.title} by ${parsed.author}">
+      return `<li class="row" data-href="${f.blob}" role="link" tabindex="0" aria-label="Open ${parsed.title} by ${parsed.author} on GitHub">
          <span class="name">${parsed.sessionNum}. ${parsed.title} by ${parsed.author} (${parsed.year})</span>
          <span class="right">
-           <!-- Open in-browser instead of forced download -->
-           <a href="${f.raw}" class="download" target="_blank" rel="noopener" aria-label="Open PDF in new tab">
+           <!-- Icon: force direct download of raw file -->
+           <a href="${f.raw}" class="save" data-url="${f.raw}" data-name="${f.name}" rel="noopener" aria-label="Download PDF">
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" />
                <path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" />
@@ -142,11 +142,40 @@
     }).join('');
   }
 
-  // Row click & keyboard navigation (don’t interfere with the icon link)
-  list.addEventListener('click', (e) => {
-    const isDownload = e.target.closest && e.target.closest('a.download');
-    if (isDownload) return; // let the anchor handle it
+  // Enforced direct-download helper with graceful fallback
+  async function forceDownload(url, filename) {
+    try {
+      const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
+      if (!res.ok) throw new Error('fetch');
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = filename || 'file.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (_) {
+      // Fallback: try native download attribute
+      const a = document.createElement('a');
+      a.href = url;
+      a.setAttribute('download', filename || 'file.pdf');
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+  }
 
+  // Row click & keyboard navigation -> GitHub blob
+  list.addEventListener('click', (e) => {
+    const saveLink = e.target.closest && e.target.closest('a.save');
+    if (saveLink) {
+      e.preventDefault();
+      forceDownload(saveLink.dataset.url, saveLink.dataset.name);
+      return;
+    }
     const row = e.target.closest('li.row');
     if (!row) return;
     const url = row.getAttribute('data-href');
