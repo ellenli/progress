@@ -14,7 +14,11 @@
     ul{list-style:none;padding:0;margin:0 0 1.5rem 0}
     li{padding:.5rem .75rem;border-bottom:1px solid #30363d;display:flex;gap:.75rem;justify-content:space-between;align-items:baseline}
     .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .right a{font-size:.95rem}
+    .right a{font-size:1.1rem;display:inline-flex;align-items:center}
+    .download-icon::before {
+      content: "⬇️";
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <body>
@@ -23,7 +27,7 @@
   <p class="meta">The PRG is a multidisciplinary reading group led by <a href="https://x.com/_benjaminparry/status/1905297341705281898" target="_blank" rel="noopener">Benjamin Parry</a> and <a href="https://www.linkedin.com/in/mixue/" target="_blank" rel="noopener">Michelle Jia</a>. We read and discuss foundational and influential papers relating to progress.</p>
   <p class="meta">We meet weekly, in-person, in Toronto. Here's what we've read so far.</p>
   <ul id="list" aria-live="polite"></ul>
-  <p class="meta">Last updated <span id="last-updated">—</span>.</p>
+  <p class="meta"><span id="file-count">—</span> papers. Last updated <span id="last-updated">—</span>.</p>
 </main>
 
 <script>
@@ -57,22 +61,42 @@
       .sort((a,b)=> a.name.localeCompare(b.name, undefined, {sensitivity:'base'}));
   }
 
+  function parseFileName(filename) {
+    // Remove extension
+    const base = filename.replace(/\.pdf$/i, '');
+    // Split by " - " only at top level
+    const parts = base.split(' - ');
+    if (parts.length < 4) return null;
+
+    const sessionNum = parseInt(parts[0], 10);
+    const year = parts[parts.length - 1];
+    const author = parts[1];
+    const title = parts.slice(2, parts.length - 1).join(' - ');
+
+    return { sessionNum, title, author, year };
+  }
+
   const list = document.getElementById('list');
   function render(items){
-    list.innerHTML = items.map(f => (
-      `<li>
-         <span class="name"><a href="${f.blob}" target="_blank" rel="noopener">${f.name}</a></span>
-         <span class="right"><a href="${f.raw}" download>Download</a></span>
-       </li>`
-    )).join('');
+    list.innerHTML = items.map(f => {
+      const parsed = parseFileName(f.name);
+      if (!parsed) return '';
+      return `<li>
+         <span class="name">${parsed.sessionNum}. ${parsed.title} by ${parsed.author} (${parsed.year})</span>
+         <span class="right"><a href="${f.raw}" class="download-icon" download></a></span>
+       </li>`;
+    }).join('');
   }
 
   try {
-    const meta = await getRepoMeta();
-    document.getElementById('last-updated').textContent = formatDate(meta.pushed_at);
-    const branch = meta.default_branch || 'main';
-    const files = await getPDFs(branch);
-    render(files);
+  const meta = await getRepoMeta();
+  const branch = meta.default_branch || 'main';
+  const files = await getPDFs(branch);
+
+  document.getElementById('file-count').textContent = files.length;
+  document.getElementById('last-updated').textContent = formatDate(meta.pushed_at);
+
+  render(files);
   } catch(e) {
     list.innerHTML = '<li>Unable to load list.</li>';
   }
