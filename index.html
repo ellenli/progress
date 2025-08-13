@@ -11,7 +11,7 @@
     main{max-width:820px;margin:0 auto;padding:4rem 1rem}
     h1{margin:0 0 1rem;font-size:1.6rem; font-family: Georgia, 'Times New Roman', Times, serif;font-weight: 400;}
     p.meta{color:var(--muted);margin:.25rem 0 1.25rem}
-    ul{list-style:none;padding:0;margin:0}
+    ul{list-style:none;padding:0;margin:0 0 1.5rem 0}
     li{padding:.5rem .75rem;border-bottom:1px solid #30363d;display:flex;gap:.75rem;justify-content:space-between;align-items:baseline}
     .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .right a{font-size:.95rem}
@@ -23,6 +23,7 @@
   <p class="meta">The PRG is a multidisciplinary reading group led by <a href="https://x.com/_benjaminparry/status/1905297341705281898" target="_blank" rel="noopener">Benjamin Parry</a> and <a href="https://www.linkedin.com/in/mixue/" target="_blank" rel="noopener">Michelle Jia</a>. We read and discuss foundational and influential papers relating to progress.</p>
   <p class="meta">We meet weekly, in-person, in Toronto. Here's what we've read so far.</p>
   <ul id="list" aria-live="polite"></ul>
+  <p class="meta">Last updated <span id="last-updated">—</span>.</p>
 </main>
 
 <script>
@@ -30,11 +31,15 @@
   const OWNER = "ellenli";
   const REPO  = "progress";
 
-  async function getDefaultBranch() {
+  function formatDate(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+  }
+
+  async function getRepoMeta() {
     const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`);
     if (!r.ok) throw new Error('repo');
-    const meta = await r.json();
-    return meta.default_branch || 'main';
+    return await r.json();
   }
 
   async function getPDFs(branch){
@@ -63,7 +68,9 @@
   }
 
   try {
-    const branch = await getDefaultBranch();
+    const meta = await getRepoMeta();
+    document.getElementById('last-updated').textContent = formatDate(meta.pushed_at);
+    const branch = meta.default_branch || 'main';
     const files = await getPDFs(branch);
     render(files);
   } catch(e) {
