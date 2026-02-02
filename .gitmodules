@@ -1,0 +1,3 @@
+[submodule "placestoread"]
+	path = placestoread
+	url = git@github.com:mitul-s/placestoread.git
