@@ -7,20 +7,13 @@
   <meta name="description" content="Progress Reading Group (PRG) is a multidisciplinary reading group led by Benjamin Parry and Michelle Jia.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
     :root {
-      --mcqueen: #C0392B;
-      --sally: #F5B7B1;
+      --primary: #c0452b;
       --white: #fff;
       --bg: #f6f6f3;
       --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-
-    @font-face {
-      font-family: '__montrealMedium_0d29d0';
-      src: url('placestoread/public/PPNeueMontreal-Medium.otf') format('opentype');
-      font-weight: 500;
-      font-style: normal;
-      font-display: swap;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; }
@@ -29,9 +22,10 @@
       height: 100%;
       padding: 0;
       margin: 0;
-      font-family: '__montrealMedium_0d29d0', '__montrealMedium_Fallback_0d29d0', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: "Inter", sans-serif;
+      font-optical-sizing: auto;     
       font-weight: 500;
-      color: var(--mcqueen);
+      color: var(--primary);
       background: var(--bg);
       font-size: 16px;
       line-height: 1.5;
@@ -54,7 +48,7 @@
       width: 100%;
       max-width: 1536px;
       margin: 0 auto;
-      padding: 3rem 1rem 4rem;
+      padding: 2.5rem 1rem 4rem;
     }
     header h1 {
       font-size: 3rem;
@@ -63,32 +57,32 @@
     }
     header p {
       max-width: 32rem;
-      margin-top: 0.25rem;
+      margin-top: 1rem;
     }
     header a {
       text-decoration: underline;
-      text-decoration-color: rgba(192, 57, 43, 0.3);
+      text-decoration-color: rgba(192, 69, 43, 0.3);
       text-underline-offset: 2px;
       transition: text-decoration-color 0.5s var(--ease), background 0.5s var(--ease);
     }
     header a:hover {
-      text-decoration-color: rgba(192, 57, 43, 1);
-      background: rgba(192, 57, 43, 0.1);
+      text-decoration-color: rgba(192, 69, 43, 1);
+      background: rgba(192, 69, 43, 0.1);
     }
 
     /* Search */
     .search-bar {
       position: relative;
       width: 100%;
-      border-top: 1px solid var(--mcqueen);
-      border-bottom: 1px solid var(--mcqueen);
+      border-top: 1px solid var(--primary);
+      border-bottom: 1px solid var(--primary);
       border-left: none;
       border-right: none;
-      background: rgba(192, 57, 43, 0.05);
+      background: rgba(192, 69, 43, 0.05);
       transition: background 0.5s var(--ease);
     }
     .search-bar:focus-within {
-      background: rgba(192, 57, 43, 0.02);
+      background: rgba(192, 69, 43, 0.02);
     }
     .search-icon {
       position: absolute;
@@ -97,7 +91,7 @@
       transform: translateY(-50%);
       width: 1.25rem;
       height: 1.25rem;
-      color: rgba(192, 57, 43, 0.6);
+      color: rgba(192, 69, 43, 0.6);
       pointer-events: none;
     }
     .search-bar input {
@@ -106,16 +100,16 @@
       outline: none;
       background: transparent;
       padding: 0.625rem 1rem 0.625rem 3rem;
-      color: var(--mcqueen);
+      color: var(--primary);
     }
     .search-bar input::placeholder {
-      color: rgba(192, 57, 43, 0.6);
+      color: rgba(192, 69, 43, 0.6);
     }
 
     /* Table header */
     .table-header {
       font-size: 1.125rem;
-      border-bottom: 2px solid var(--mcqueen);
+      border-bottom: 2px solid var(--primary);
       padding: 0.25rem 0;
     }
     .table-header ul {
@@ -126,16 +120,39 @@
       padding: 0 1rem;
       gap: 0.5rem;
     }
+    .table-header li[data-sort] {
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.3s var(--ease);
+      position: relative;
+    }
+    .table-header li[data-sort]:hover {
+      opacity: 0.7;
+    }
+    .table-header li[data-sort]::before {
+      content: '↑';
+      position: absolute;
+      right: 100%;
+      margin-right: 0.25rem;
+      opacity: 0.4;
+      transition: opacity 0.3s var(--ease);
+    }
+    .table-header li[data-sort].active::before {
+      opacity: 1;
+    }
+    .table-header li[data-sort].desc::before {
+      content: '↓';
+    }
 
     /* Paper list */
     .paper-list {
       padding: 0;
-      border-bottom: 1px solid var(--mcqueen);
+      border-bottom: 1px solid var(--primary);
     }
 
     /* Row */
     .paper-row {
-      border-bottom: 1px solid var(--mcqueen);
+      border-bottom: 1px solid var(--primary);
     }
     .paper-row:last-child {
       border-bottom: none;
@@ -158,20 +175,20 @@
       margin: 0 auto;
     }
     .paper-trigger:hover {
-      background: rgba(192, 57, 43, 0.05);
+      background: rgba(192, 69, 43, 0.05);
     }
     .paper-num {
       font-variant-numeric: tabular-nums;
     }
     .paper-title {
-      font-weight: 600;
+      font-weight: 700;
     }
     .paper-arrow {
       margin-left: auto;
       transition: transform 0.5s var(--ease);
     }
     .paper-row.open .paper-arrow {
-      transform: rotate(90deg);
+      transform: rotate(45deg);
     }
 
     /* Expanded content */
@@ -219,14 +236,14 @@
       align-items: center;
       gap: 0.375rem;
       padding: 0.25rem 0.5rem;
-      background: rgba(192, 57, 43, 0.1);
+      background: rgba(192, 69, 43, 0.1);
       border-radius: 2px;
       font-size: 0.875rem;
       transition: background 0.5s var(--ease), color 0.5s var(--ease);
       width: fit-content;
     }
     .read-link:hover {
-      background: var(--mcqueen);
+      background: var(--primary);
       color: white;
       text-decoration: none;
     }
@@ -234,7 +251,7 @@
     /* Footer */
     footer {
       margin-top: auto;
-      background: var(--mcqueen);
+      background: var(--primary);
       color: white;
       padding: 0.5rem 1rem;
       display: flex;
@@ -326,9 +343,9 @@
       <p>
         Progress Reading Group (PRG) is a multidisciplinary reading group led by
         <a href="https://x.com/_benjaminparry/status/1905297341705281898" target="_blank" rel="noopener">Benjamin Parry</a>
-        and <a href="https://www.linkedin.com/in/mixue/" target="_blank" rel="noopener">Michelle Jia</a>.
-        We read influential papers across many academic fields, and investigate them from the lens of progress.
-        Our group meets every week, in person, in Toronto.
+        and <a href="https://x.com/jiamixue" target="_blank" rel="noopener">Michelle Jia</a>.
+        We read influential papers across many academic fields and investigate them from the lens of progress.
+        PRG meets every week in downtown Toronto.
       </p>
     </header>
 
@@ -343,11 +360,11 @@
       <div class="table-header">
         <ul>
           <li></li>
-          <li>Title</li>
-          <li>Author</li>
-          <li>Year</li>
-          <li>Field</li>
-          <li>Approx. Length</li>
+          <li data-sort="title">Title</li>
+          <li data-sort="author">Author</li>
+          <li data-sort="year">Year</li>
+          <li data-sort="field">Field</li>
+          <li data-sort="minutes">Read time</li>
         </ul>
       </div>
 
@@ -357,6 +374,7 @@
     </main>
 
     <footer>
+      Last updated February 3, 2026
       <a href="https://github.com/ellenli/progress" target="_blank" rel="noopener">GitHub</a>
     </footer>
   </div>
@@ -469,7 +487,50 @@
 
   const list = document.getElementById('list');
   const searchInput = document.getElementById('search');
+  const sortHeaders = document.querySelectorAll('.table-header li[data-sort]');
   let allItems = [];
+  let currentSort = { key: 'num', desc: true }; // Default: newest first by paper num
+
+  function getSortValue(item, key) {
+    const parsed = parseFileName(item.name);
+    if (!parsed) return '';
+    const numKey = parsed.sessionNum.replace(/^0+/, '') || '0';
+    const meta = PAPER_META[numKey] || PAPER_META[parsed.sessionNum] || {};
+
+    switch (key) {
+      case 'num': return parseInt(parsed.sessionNum, 10) || 0;
+      case 'title': return parsed.title.toLowerCase();
+      case 'author': return parsed.author.toLowerCase();
+      case 'year': return parseInt(parsed.year, 10) || 0;
+      case 'field': return (meta.field || '').toLowerCase();
+      case 'minutes': return meta.minutes || 0;
+      default: return '';
+    }
+  }
+
+  function sortItems(items, key, desc) {
+    return [...items].sort((a, b) => {
+      const valA = getSortValue(a, key);
+      const valB = getSortValue(b, key);
+      let cmp = 0;
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        cmp = valA - valB;
+      } else {
+        cmp = String(valA).localeCompare(String(valB));
+      }
+      return desc ? -cmp : cmp;
+    });
+  }
+
+  function updateSortUI() {
+    sortHeaders.forEach(h => {
+      h.classList.remove('active', 'desc');
+      if (h.dataset.sort === currentSort.key) {
+        h.classList.add('active');
+        if (currentSort.desc) h.classList.add('desc');
+      }
+    });
+  }
 
   function render(items) {
     if (items.length === 0) {
@@ -505,7 +566,7 @@
           <span class="mobile-hide">${minutes}</span>
           <span class="paper-arrow">
             <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6.392 11.21 5.37 10.2 8.92 6.648H0V5.17h8.92L5.37 1.625 6.391.608l5.301 5.301-5.3 5.301Z" fill="currentColor"/>
+              <path d="M6.75 0.75V5.25H11.25V6.75H6.75V11.25H5.25V6.75H0.75V5.25H5.25V0.75H6.75Z" fill="currentColor"/>
             </svg>
           </span>
         </button>
@@ -552,7 +613,7 @@
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
     if (!query) {
-      render(allItems);
+      render(sortItems(allItems, currentSort.key, currentSort.desc));
       return;
     }
     const filtered = allItems.filter(f => {
@@ -567,7 +628,36 @@
       ].join(' ').toLowerCase();
       return searchable.includes(query);
     });
-    render(filtered);
+    render(sortItems(filtered, currentSort.key, currentSort.desc));
+  });
+
+  sortHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+      const key = header.dataset.sort;
+      if (currentSort.key === key) {
+        currentSort.desc = !currentSort.desc;
+      } else {
+        currentSort.key = key;
+        currentSort.desc = false;
+      }
+      updateSortUI();
+      const query = searchInput.value.toLowerCase();
+      let items = allItems;
+      if (query) {
+        items = allItems.filter(f => {
+          const parsed = parseFileName(f.name);
+          if (!parsed) return false;
+          const numKey = parsed.sessionNum.replace(/^0+/, '') || '0';
+          const meta = PAPER_META[numKey] || PAPER_META[parsed.sessionNum] || {};
+          const searchable = [
+            parsed.sessionNum, parsed.title, parsed.author, parsed.year,
+            meta.field || '', meta.themes || '', meta.summary || '', meta.readDate || ''
+          ].join(' ').toLowerCase();
+          return searchable.includes(query);
+        });
+      }
+      render(sortItems(items, currentSort.key, currentSort.desc));
+    });
   });
 
   try {
@@ -575,9 +665,9 @@
     const branch = meta.default_branch || 'main';
     const githubItems = await getPDFs(branch);
     // Merge GitHub PDFs with extra papers not in the repo
-    allItems = [...githubItems, ...EXTRA_PAPERS]
-      .sort((a, b) => b.name.localeCompare(a.name, undefined, { sensitivity: 'base' }));
-    render(allItems);
+    allItems = [...githubItems, ...EXTRA_PAPERS];
+    // Default sort: by paper num, newest first
+    render(sortItems(allItems, currentSort.key, currentSort.desc));
   } catch (e) {
     list.innerHTML = '<li class="loading">Unable to load papers.</li>';
   }
