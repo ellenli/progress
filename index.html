@@ -4,98 +4,426 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Progress Reading Group</title>
+  <meta name="description" content="Progress Reading Group (PRG) is a multidisciplinary reading group led by Benjamin Parry and Michelle Jia.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
   <style>
-    :root { --bg:#0d1117; --fg:#c9d1d9; --muted:#8b949e; --accent:#58a6ff; }
-    html,body {
-      margin:0;
-      padding:0;
-      background:var(--bg);
-      color:var(--fg);
-      font:16px/1.5 Inter,system-ui,Segoe UI,Arial,sans-serif
+    :root {
+      --mcqueen: #C0392B;
+      --sally: #F5B7B1;
+      --white: #fff;
+      --bg: #f6f6f3;
+      --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
     }
-    a { color:var(--accent); text-decoration:none }
-    a:hover { text-decoration:underline }
-    main { max-width:900px; margin:0 auto; padding:3rem 1rem }
-    h1 {
-      margin:0 0 1rem;
-      font-size:1.6rem;
-      font-family: Georgia, Times, serif;
-      font-weight: 400;
+
+    @font-face {
+      font-family: '__montrealMedium_0d29d0';
+      src: url('placestoread/public/PPNeueMontreal-Medium.otf') format('opentype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
     }
-    p.meta { color:var(--muted); margin:.25rem 0 1.25rem }
-    ul { list-style:none; padding:0; margin:0 0 1.5rem 0 }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+    html, body {
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      font-family: '__montrealMedium_0d29d0', '__montrealMedium_Fallback_0d29d0', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 500;
+      color: var(--mcqueen);
+      background: var(--bg);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    li { list-style: none; }
+    img, svg { display: block; max-width: 100%; }
+    input { font: inherit; }
+    p, h1, h2, h3 { overflow-wrap: break-word; }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    /* Header */
+    header {
+      width: 100%;
+      max-width: 1536px;
+      margin: 0 auto;
+      padding: 3rem 1rem 4rem;
+    }
+    header h1 {
+      font-size: 3rem;
+      line-height: 1;
+      font-weight: 500;
+    }
+    header p {
+      max-width: 32rem;
+      margin-top: 0.25rem;
+    }
+    header a {
+      text-decoration: underline;
+      text-decoration-color: rgba(192, 57, 43, 0.3);
+      text-underline-offset: 2px;
+      transition: text-decoration-color 0.5s var(--ease), background 0.5s var(--ease);
+    }
+    header a:hover {
+      text-decoration-color: rgba(192, 57, 43, 1);
+      background: rgba(192, 57, 43, 0.1);
+    }
+
+    /* Search */
+    .search-bar {
+      position: relative;
+      width: 100%;
+      border-top: 1px solid var(--mcqueen);
+      border-bottom: 1px solid var(--mcqueen);
+      border-left: none;
+      border-right: none;
+      background: rgba(192, 57, 43, 0.05);
+      transition: background 0.5s var(--ease);
+    }
+    .search-bar:focus-within {
+      background: rgba(192, 57, 43, 0.02);
+    }
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 1rem;
+      transform: translateY(-50%);
+      width: 1.25rem;
+      height: 1.25rem;
+      color: rgba(192, 57, 43, 0.6);
+      pointer-events: none;
+    }
+    .search-bar input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 0.625rem 1rem 0.625rem 3rem;
+      color: var(--mcqueen);
+    }
+    .search-bar input::placeholder {
+      color: rgba(192, 57, 43, 0.6);
+    }
+
+    /* Table header */
+    .table-header {
+      font-size: 1.125rem;
+      border-bottom: 2px solid var(--mcqueen);
+      padding: 0.25rem 0;
+    }
+    .table-header ul {
+      display: grid;
+      grid-template-columns: 2.5rem 1.5fr 0.8fr 0.4fr 0.6fr 0.6fr 1.5rem;
+      max-width: 1536px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      gap: 0.5rem;
+    }
+
+    /* Paper list */
+    .paper-list {
+      padding: 0;
+      border-bottom: 1px solid var(--mcqueen);
+    }
 
     /* Row */
-    li.row {
-      padding:.5rem .75rem;
-      border-bottom:1px solid #30363d;
-      display:flex;
-      gap:.75rem;
-      justify-content:space-between;
-      align-items:center;           /* prevent any vertical wobble */
-      transition: background-color .15s ease;
-      cursor: pointer;              /* whole row is clickable */
+    .paper-row {
+      border-bottom: 1px solid var(--mcqueen);
     }
-    /* Symmetric top border on the first row */
-    #list > li.row:first-child {
-      border-top:1px solid #30363d;
+    .paper-row:last-child {
+      border-bottom: none;
+    }
+    .paper-trigger {
+      display: grid;
+      grid-template-columns: 2.5rem 1.5fr 0.8fr 0.4fr 0.6fr 0.6fr 1.5rem;
+      width: 100%;
+      text-align: left;
+      padding: 0.625rem 1rem;
+      gap: 0.5rem;
+      align-items: center;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      transition: background 0.5s var(--ease);
+      max-width: 1536px;
+      margin: 0 auto;
+    }
+    .paper-trigger:hover {
+      background: rgba(192, 57, 43, 0.05);
+    }
+    .paper-num {
+      font-variant-numeric: tabular-nums;
+    }
+    .paper-title {
+      font-weight: 600;
+    }
+    .paper-arrow {
+      margin-left: auto;
+      transition: transform 0.5s var(--ease);
+    }
+    .paper-row.open .paper-arrow {
+      transform: rotate(90deg);
     }
 
-    li.row:hover { background:#161b22; }
-    li.row:focus { outline:2px solid var(--accent); outline-offset:2px; }
-
-    .name {
-      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-      transition: color .15s ease;
+    /* Expanded content */
+    .paper-content {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.5s var(--ease);
     }
-    li.row:hover .name { color: var(--accent); }
-
-    .right a svg {
-      width: 20px;
-      height: 20px;
-      display: block;
-      color: var(--accent);
-      transition: color 0.2s ease, filter 0.2s ease;
+    .paper-row.open .paper-content {
+      max-height: 500px;
+      transition: max-height 0.5s var(--ease);
     }
-    /* Icon highlights with the row but doesn't move */
-    li.row:hover .right a svg {
-      filter: brightness(1.2);
+    .paper-details {
+      display: grid;
+      grid-template-columns: 2.5rem 1.5fr 0.8fr 0.4fr 0.6fr 0.6fr 1.5rem;
+      padding: 0 1rem 1.5rem;
+      gap: 0.5rem;
+      max-width: 1536px;
+      margin: 0 auto;
+    }
+    .paper-details-inner {
+      grid-column: 2 / -2;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .paper-summary {
+      max-width: 60ch;
+      line-height: 1.6;
+    }
+    .detail-row {
+      display: flex;
+      flex-direction: column;
+    }
+    .detail-label {
+      font-size: 0.875rem;
+      margin-bottom: 0.125rem;
+      opacity: 0.7;
+    }
+    .detail-value {
+      font-size: 0.9375rem;
+    }
+    .read-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      background: rgba(192, 57, 43, 0.1);
+      border-radius: 2px;
+      font-size: 0.875rem;
+      transition: background 0.5s var(--ease), color 0.5s var(--ease);
+      width: fit-content;
+    }
+    .read-link:hover {
+      background: var(--mcqueen);
+      color: white;
+      text-decoration: none;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      background: var(--mcqueen);
+      color: white;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: baseline;
+    }
+    footer a {
+      margin-left: auto;
+      font-size: 0.875rem;
+      letter-spacing: 0.025em;
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 255, 255, 0.3);
+      text-underline-offset: 2px;
+      transition: text-decoration-color 0.5s var(--ease);
+    }
+    footer a:hover {
+      text-decoration-color: rgba(255, 255, 255, 1);
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      header h1 { font-size: 2.5rem; }
+
+      .table-header { display: none; }
+
+      .paper-trigger {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.875rem 1rem;
+      }
+      .paper-num {
+        display: none !important;
+      }
+      .paper-trigger-text {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        flex: 1;
+        min-width: 0;
+      }
+      .paper-trigger-text .paper-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 500;
+      }
+      .paper-trigger-meta {
+        font-size: 0.875rem;
+        opacity: 0.7;
+      }
+      .mobile-hide { display: none; }
+      .mobile-show { display: flex !important; }
+
+      .paper-arrow {
+        flex-shrink: 0;
+      }
+
+      .paper-details {
+        display: flex;
+        padding: 0;
+      }
+      .paper-details-inner {
+        padding: 0 1rem 1.5rem;
+      }
+      .paper-details::before {
+        display: none;
+      }
+    }
+    @media (min-width: 769px) {
+      .mobile-show { display: none !important; }
+      .search-bar {
+        margin-bottom: 3rem;
+        margin-top: -1rem;
+      }
+    }
+
+    /* Loading */
+    .loading {
+      padding: 2rem 1rem;
+      text-align: center;
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
-<main>
-  <h1>Progress Reading Group</h1>
-  <p class="meta">
-    The Progress Reading Group (PRG) is a multidisciplinary reading group led by 
-    <a href="https://x.com/_benjaminparry/status/1905297341705281898" target="_blank" rel="noopener">Benjamin Parry</a> 
-    and <a href="https://www.linkedin.com/in/mixue/" target="_blank" rel="noopener">Michelle Jia</a>.</p>
-  <p class="meta">
-    We read influential papers across many academic fields, and investigate them from the lens of progress. Our group meets every week, in person, in Toronto.
-  </p>
-  <p class="meta">
-    Here are the <span id="file-count"></span> papers we’ve read since our group’s first meeting on June 9, 2025. Click 
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" 
-         fill="currentColor" width="1.2em" height="1.2em" 
-         style="vertical-align:middle; color:var(--accent); margin-top: -0.3em">
-      <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" />
-      <path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" />
-    </svg>
-    to download the PDF.
-  </p>
-  <ul id="list" aria-live="polite"></ul>
-  <p class="meta">Last updated <span id="last-updated"></span> via <a href="https://github.com/ellenli/progress" target="_blank" rel="noopener">GitHub</a>.</p>
-</main>
+  <div class="wrapper">
+    <header>
+      <h1>Progress Reading Group</h1>
+      <p>
+        Progress Reading Group (PRG) is a multidisciplinary reading group led by
+        <a href="https://x.com/_benjaminparry/status/1905297341705281898" target="_blank" rel="noopener">Benjamin Parry</a>
+        and <a href="https://www.linkedin.com/in/mixue/" target="_blank" rel="noopener">Michelle Jia</a>.
+        We read influential papers across many academic fields, and investigate them from the lens of progress.
+        Our group meets every week, in person, in Toronto.
+      </p>
+    </header>
+
+    <div class="search-bar">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+        <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/>
+      </svg>
+      <input type="text" id="search" placeholder="Search for papers..." autocomplete="off">
+    </div>
+
+    <main>
+      <div class="table-header">
+        <ul>
+          <li></li>
+          <li>Title</li>
+          <li>Author</li>
+          <li>Year</li>
+          <li>Field</li>
+          <li>Approx. Length</li>
+        </ul>
+      </div>
+
+      <ul id="list" class="paper-list" aria-live="polite">
+        <li class="loading">Loading papers...</li>
+      </ul>
+    </main>
+
+    <footer>
+      <a href="https://github.com/ellenli/progress" target="_blank" rel="noopener">GitHub</a>
+    </footer>
+  </div>
 
 <script>
 (async () => {
   const OWNER = "ellenli";
   const REPO  = "progress";
 
-  function formatDate(iso){
-    const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
-  }
+  // Metadata keyed by filename prefix (what appears before the first " - " in the PDF name)
+  // For GitHub-hosted PDFs, the key matches the number in the filename.
+  // For non-GitHub papers, we use EXTRA_PAPERS below.
+  const PAPER_META = {
+    // Sessions 1-16: GitHub-hosted PDFs (keyed by filename prefix)
+    "01": { field: "Art Theory", minutes: 45, readDate: "June 11, 2025", themes: "art, technology, media, reproduction, aura", summary: "Walter Benjamin argues that mechanical reproduction of art diminishes its \u2018aura\u2019\u2014the unique presence and authority of an original work\u2014transforming how art is experienced and its political function in the age of mass media." },
+    "02": { field: "Systems Theory", minutes: 35, readDate: "June 18, 2025", themes: "complexity, systems theory, hierarchy, near-decomposability", summary: "Herbert Simon explores how complex systems are organized hierarchically, arguing that nature favors hierarchical structures because they evolve far more quickly than non-hierarchical ones, and that decomposability is key to understanding complexity." },
+    "03": { field: "Philosophy", minutes: 30, readDate: "June 25, 2025", themes: "philosophy, pragmatism, epistemology, faith, belief", summary: "William James defends the right to believe in matters where evidence is insufficient, arguing that in certain genuine dilemmas\u2014particularly moral and religious questions\u2014choosing to believe ahead of evidence is both rational and necessary." },
+    "04": { field: "Philosophy of Mind", minutes: 30, readDate: "July 2, 2025", themes: "cognitive science, philosophy of mind, embodied cognition, extended cognition", summary: "Andy Clark and David Chalmers argue that the mind extends beyond the brain, proposing that external tools and environmental resources can constitute genuine parts of cognitive processes when they are reliably coupled with the organism." },
+    "05": { field: "Biology", minutes: 15, readDate: "July 9, 2025", themes: "biology, scaling, physics, size, physiology", summary: "J.B.S. Haldane explains why animals of different sizes have fundamentally different body plans, showing that the laws of physics constrain biological design\u2014what works at one scale fails at another." },
+    "06": { field: "Information Science", minutes: 30, readDate: "July 16, 2025", themes: "information theory, attention economy, organization design, scarcity", summary: "Herbert Simon argues that in an information-rich world, the scarce resource is not information but attention, and that designing effective information systems requires understanding how to allocate human attention efficiently." },
+    "07": { field: "Social Theory", minutes: 40, readDate: "July 23, 2025", themes: "modernity, culture, politics, Enlightenment, progress", summary: "Charles Taylor distinguishes between \u2018cultural\u2019 and \u2018acultural\u2019 theories of modernity, arguing that modernity is not a single universal process but takes culturally distinct forms that cannot be reduced to a common institutional template." },
+    "08": { field: "Technology", minutes: 25, readDate: "July 30, 2025", themes: "technology, information, hypertext, memex, knowledge management", summary: "Vannevar Bush envisions the \u2018memex,\u2019 a device for storing, linking, and retrieving vast amounts of information along associative trails\u2014a prescient vision of hypertext and the modern web, written as WWII drew to a close." },
+    "09": { field: "Physics / Philosophy", minutes: 25, readDate: "August 6, 2025", themes: "mathematics, physics, philosophy of science, epistemology", summary: "Eugene Wigner marvels at the surprising and unexplained effectiveness of mathematics in describing the physical world, arguing this \u2018unreasonable effectiveness\u2019 is a deep mystery that demands philosophical attention." },
+    "10": { field: "Epistemology", minutes: 35, readDate: "August 13, 2025", themes: "philosophy, gamification, value, clarity, aesthetics", summary: "C. Thi Nguyen warns that our desire for clear, simple metrics and quantified measures can seduce us into replacing rich, nuanced values with thin proxies, distorting our goals and undermining genuine understanding." },
+    "11": { field: "Evolutionary Biology", minutes: 35, readDate: "August 20, 2025", themes: "evolutionary biology, adaptation, exaptation, critique of adaptationism", summary: "Gould and Lewontin critique adaptationism\u2014the tendency to assume every biological trait is an optimal adaptation\u2014drawing an analogy to architectural spandrels to argue that many traits arise as structural byproducts rather than direct products of natural selection." },
+    "12": { field: "Physics", minutes: 20, readDate: "August 27, 2025", themes: "physics, emergence, reductionism, complexity, philosophy of science", summary: "P.W. Anderson argues against reductionism, contending that at each level of complexity entirely new properties and laws emerge that cannot be predicted from the laws governing simpler constituents\u2014\u2018more is different.\u2019" },
+    "13": { field: "Philosophy", minutes: 40, readDate: "September 3, 2025", themes: "philosophy, values, systems, metrics, Goodhart\u2019s law", summary: "C. Thi Nguyen develops the concept of \u2018value capture,\u2019 where simplified institutional metrics colonize our values, replacing our rich ends with the thin, quantified proxies that institutions use to measure them." },
+    "14": { field: "Economics", minutes: 30, readDate: "September 10, 2025", themes: "economics, information asymmetry, adverse selection, market failure", summary: "George Akerlof shows how information asymmetry between buyers and sellers can cause market collapse: when buyers cannot distinguish quality, bad products (\u2018lemons\u2019) drive out good ones, with implications for insurance, credit, and beyond." },
+    "15": { field: "Science / Career", minutes: 45, readDate: "September 17, 2025", themes: "research, science, creativity, career advice, excellence", summary: "Richard Hamming reflects on what distinguishes great scientists from merely competent ones, offering practical wisdom on courage, working on important problems, and the habits of mind that lead to significant contributions." },
+    // Two repo PDFs share filename prefix "16": Rosa (first alphabetically) and Berlin
+    "16": { field: "Political Philosophy", minutes: 50, readDate: "September 24, 2025", themes: "political philosophy, freedom, liberty, negative liberty, positive liberty", summary: "Isaiah Berlin distinguishes between \u2018negative\u2019 liberty (freedom from interference) and \u2018positive\u2019 liberty (freedom to realize one\u2019s potential), exploring how each concept has been used and abused in political thought." },
+    "16b": { field: "Sociology", minutes: 40, themes: "sociology, acceleration, modernity, time, technology", summary: "Hartmut Rosa develops a theory of social acceleration, identifying three categories\u2014technological, social change, and pace of life\u2014and arguing that acceleration has become a self-propelling force shaping modern societies in profound ways." },
+    // Repo PDFs #17 and #18 (Hacking, Kuhn) are bonus readings not on the session schedule
+    "17": { field: "Philosophy of Science", minutes: 25, themes: "philosophy of science, classification, social construction, identity", summary: "Ian Hacking argues that scientific and bureaucratic categories do not merely describe people but actively shape how individuals understand and constitute themselves\u2014that classifying people changes who they become." },
+    "18": { field: "Philosophy of Science", minutes: 30, themes: "philosophy of science, theory choice, objectivity, values, scientific method", summary: "Thomas Kuhn argues that theory choice in science is never fully determined by objective criteria alone, but inevitably involves subjective value judgments\u2014accuracy, consistency, scope, simplicity, and fruitfulness\u2014whose relative weighting varies among scientists." },
+    // Sessions 17-29: extra papers not in GitHub repo (keyed by EXTRA_PAPERS name prefix)
+    "19": { field: "Philosophy of Technology", minutes: 35, readDate: "October 30, 2025", themes: "philosophy of technology, technological determinism, social impact of technology", summary: "Langdon Winner argues that technologies are not neutral tools but embody specific forms of power and authority, and that our uncritical adoption of new technologies amounts to a kind of \u2018technological somnambulism\u2019 that reshapes social and political life." },
+    "20": { field: "Energy Policy", minutes: 30, readDate: "November 6, 2025", themes: "transportation, energy policy, social equity, technology critique", summary: "Ivan Illich argues that beyond a certain threshold, increased energy consumption in transportation creates more inequality and wasted time, proposing that equity and freedom require limiting speed and energy use to human-scale levels." },
+    "21": { field: "Complexity Science", minutes: 35, readDate: "November 13, 2025", themes: "complexity science, biology, self-organization, systems theory", summary: "Varela, Maturana, and Uribe define autopoiesis\u2014the self-producing organization of living systems\u2014and present a formal model demonstrating that life is characterized not by its components but by the circular organization that continuously regenerates itself." },
+    "22": { field: "Philosophy of Education", minutes: 30, readDate: "November 20, 2025", themes: "philosophy, education, politics, truth, morality", summary: "Hannah Arendt argues that the crisis in American education reflects a deeper crisis in modernity: the loss of authority and tradition that are essential for introducing children to an established world while preserving their capacity for newness." },
+    "23": { field: "Anthropology", minutes: 25, readDate: "November 27, 2025", themes: "anthropology, liminality, ritual, rites of passage", summary: "Victor Turner examines the liminal phase of rites of passage\u2014the ambiguous threshold between social positions\u2014revealing how initiands become structureless, equal, and bound by intense communitas before being reincorporated into society with new status." },
+    "24": { field: "Sociology", minutes: 35, readDate: "December 4, 2025", themes: "sociology, excellence, talent, qualitative vs quantitative", summary: "Daniel Chambliss argues that excellence is not the product of extraordinary talent or quantitative increases in effort, but of consistent qualitative differences in technique, discipline, and attitude\u2014making Olympic-level success surprisingly mundane in its origins." },
+    "25": { field: "Sciences and Humanities", minutes: 30, readDate: "December 11, 2025", themes: "sciences vs humanities, education, intellectual culture", summary: "C.P. Snow diagnoses a dangerous split between literary intellectuals and natural scientists into \u2018two cultures\u2019 that cannot communicate, arguing this division impoverishes both and imperils society\u2019s ability to address its most pressing problems." },
+    "26": { field: "Media Theory", minutes: 25, readDate: "December 18, 2025", themes: "media theory, technology, communication, philosophy of media", summary: "Marshall McLuhan argues that the medium through which content is delivered matters more than the content itself, and that each new medium reshapes human perception, social organization, and the pace of life in ways we rarely notice." },
+    "27": { field: "Sociology", minutes: 35, readDate: "January 8, 2026", themes: "social networks, sociology, network theory, social capital", summary: "Mark Granovetter demonstrates that weak social ties\u2014acquaintances rather than close friends\u2014are disproportionately important for transmitting novel information, finding jobs, and bridging otherwise disconnected social clusters." },
+    "28": { field: "Sociology / Economics", minutes: 40, readDate: "January 15, 2026", themes: "social capital, economics, sociology, education", summary: "James Coleman argues that social capital\u2014the resources inherent in social relationships and community structures\u2014plays a crucial role in creating human capital, particularly through family and community networks that support educational achievement." },
+    "29": { field: "Feminist Philosophy", minutes: 30, readDate: "January 22, 2026", themes: "feminist philosophy, love, play, perception, phenomenology", summary: "Maria Lugones develops the concepts of \u2018world-travelling\u2019 and playfulness as practices of love across difference, arguing that understanding others requires entering their \u2018worlds\u2019 with a playful attitude that resists arrogant perception." },
+    "30": { field: "Feminist Philosophy", minutes: 45, readDate: "January 28, 2026", themes: "feminist philosophy, gender, existentialism, social theory", summary: "Simone de Beauvoir argues that woman is not born but made\u2014that femininity is a social construction imposed through myth, education, and economic dependence\u2014laying the philosophical groundwork for modern feminist thought and existentialist ethics." },
+    "31": { field: "Pragmatism / Ethics", minutes: 25, readDate: "February 4, 2026", themes: "pragmatism, ethics, political philosophy, social reform", summary: "William James proposes that the martial virtues of discipline, sacrifice, and collective purpose can be redirected from warfare toward peaceful civic endeavors, arguing that society needs a moral equivalent of war to channel human energy constructively." },
+  };
+
+  // Papers not hosted on GitHub (sessions 17+), rendered alongside GitHub PDFs
+  const EXTRA_PAPERS = [
+    { name: "19 - Langdon Winner - Technologies As Forms of Life - 1983", raw: null },
+    { name: "20 - Ivan Illich - Energy and Equity - 1974", raw: "https://blogs.ubc.ca/landscapesofenergy/files/2010/11/ivan-illich-energy_and_equity.pdf" },
+    { name: "21 - F.G. Varela, H.R. Maturana, R. Uribe - Autopoiesis - 1974", raw: "https://monoskop.org/images/d/dd/Varela_Maturana_Uribe_1974_Autopoiesis.pdf" },
+    { name: "22 - Hannah Arendt - The Crisis of Education - 1958", raw: null },
+    { name: "23 - Victor Turner - Betwixt and Between - 1964", raw: null },
+    { name: "24 - Daniel F. Chambliss - The Mundanity of Excellence - 1989", raw: "https://fermatslibrary.com/s/the-mundanity-of-excellence-an-ethnographic-report-on-stratification-and-olympic-swimmers" },
+    { name: "25 - C.P. Snow - The Two Cultures - 1959", raw: null },
+    { name: "26 - Marshall McLuhan - The Medium is the Message - 1964", raw: null },
+    { name: "27 - Mark S. Granovetter - The Strength of Weak Ties - 1973", raw: null },
+    { name: "28 - James Coleman - Social Capital in the Creation of Human Capital - 1988", raw: null },
+    { name: "29 - Maria Lugones - Playfulness, World-Travelling, and Loving Perception - 1987", raw: null },
+    { name: "30 - Simone de Beauvoir - The Second Sex - 1949", raw: null },
+    { name: "31 - William James - The Moral Equivalent of War - 1906", raw: null },
+  ];
 
   async function getRepoMeta() {
     const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`);
@@ -103,7 +431,7 @@
     return await r.json();
   }
 
-  async function getPDFs(branch){
+  async function getPDFs(branch) {
     const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
     if (!r.ok) throw new Error('tree');
     const data = await r.json();
@@ -112,107 +440,146 @@
       .map(n => ({
         path: n.path,
         name: n.path.split('/').pop(),
-        blob: `https://github.com/${OWNER}/${REPO}/blob/${branch}/${n.path}`,
-        raw:  `https://raw.githubusercontent.com/${OWNER}/${REPO}/${branch}/${n.path}`
+        raw: `https://raw.githubusercontent.com/${OWNER}/${REPO}/${branch}/${n.path}`
       }))
-      .sort((a,b)=> a.name.localeCompare(b.name, undefined, {sensitivity:'base'}));
+      .sort((a, b) => b.name.localeCompare(a.name, undefined, { sensitivity: 'base' }));
   }
 
   function parseFileName(filename) {
     const base = filename.replace(/\.pdf$/i, '');
     const parts = base.split(' - ');
     if (parts.length < 4) return null;
-
-    const sessionNum = parseInt(parts[0], 10);
-    const year = parts[parts.length - 1];
-    const author = parts[1];
-    const title = parts.slice(2, parts.length - 1).join(' - ');
-
+    const sessionNum = parts[0].trim();
+    const year = parts[parts.length - 1].trim();
+    const author = parts[1].trim();
+    const title = parts.slice(2, parts.length - 1).join(' - ').trim();
     return { sessionNum, title, author, year };
   }
 
-  const list = document.getElementById('list');
+  // Build a lookup from title keywords to metaKey for extra papers
+  // that might share a session number with a GitHub PDF
+  function getMetaKey(parsed, seenNums) {
+    let metaKey = parsed.sessionNum.replace(/^0+/, '') || '0';
+    if (seenNums[metaKey]) {
+      metaKey = metaKey + 'b';
+    }
+    seenNums[metaKey] = true;
+    return metaKey;
+  }
 
-  function render(items){
+  const list = document.getElementById('list');
+  const searchInput = document.getElementById('search');
+  let allItems = [];
+
+  function render(items) {
+    if (items.length === 0) {
+      list.innerHTML = '<li class="loading">No papers found.</li>';
+      return;
+    }
+
+    const seenNums = {};
+
     list.innerHTML = items.map(f => {
       const parsed = parseFileName(f.name);
       if (!parsed) return '';
-      return `<li class="row" data-href="${f.blob}" role="link" tabindex="0" aria-label="Open ${parsed.title} by ${parsed.author} on GitHub">
-         <span class="name">${parsed.sessionNum}. ${parsed.title} by ${parsed.author} (${parsed.year})</span>
-         <span class="right">
-           <!-- Icon: force direct download of raw file -->
-           <a href="${f.raw}" class="save" data-url="${f.raw}" data-name="${f.name}" rel="noopener" aria-label="Download PDF">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
-               <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" />
-               <path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" />
-             </svg>
-           </a>
-         </span>
-       </li>`;
+
+      const metaKey = getMetaKey(parsed, seenNums);
+      const meta = PAPER_META[metaKey] || PAPER_META[parsed.sessionNum] || {};
+      const field = meta.field || '';
+      const minutes = meta.minutes ? meta.minutes + ' min' : '';
+      const summary = meta.summary || '';
+      const themes = meta.themes || '';
+      const readDate = meta.readDate || '';
+
+      return `<li class="paper-row">
+        <button class="paper-trigger" aria-expanded="false">
+          <span class="paper-num mobile-hide">${parsed.sessionNum}</span>
+          <span class="paper-trigger-text mobile-show">
+            <span class="paper-title">${parsed.title}</span>
+            <span class="paper-trigger-meta">${parsed.author}, ${parsed.year}</span>
+          </span>
+          <span class="paper-title mobile-hide">${parsed.title}</span>
+          <span class="mobile-hide">${parsed.author}</span>
+          <span class="mobile-hide">${parsed.year}</span>
+          <span class="mobile-hide">${field}</span>
+          <span class="mobile-hide">${minutes}</span>
+          <span class="paper-arrow">
+            <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6.392 11.21 5.37 10.2 8.92 6.648H0V5.17h8.92L5.37 1.625 6.391.608l5.301 5.301-5.3 5.301Z" fill="currentColor"/>
+            </svg>
+          </span>
+        </button>
+        <div class="paper-content">
+          <div class="paper-details">
+            <div class="paper-details-inner">
+              ${summary ? `<p class="paper-summary">${summary}</p>` : ''}
+              ${themes ? `<div class="detail-row">
+                <div class="detail-label">Themes</div>
+                <div class="detail-value">${themes}</div>
+              </div>` : ''}
+              ${readDate ? `<div class="detail-row">
+                <div class="detail-label">Read Date</div>
+                <div class="detail-value">${readDate}</div>
+              </div>` : ''}
+              ${f.raw ? `<a href="${f.raw}" class="read-link" target="_blank" rel="noopener">
+                Read the full paper
+                <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6.392 11.21 5.37 10.2 8.92 6.648H0V5.17h8.92L5.37 1.625 6.391.608l5.301 5.301-5.3 5.301Z" fill="currentColor"/>
+                </svg>
+              </a>` : ''}
+            </div>
+          </div>
+        </div>
+      </li>`;
     }).join('');
+
+    list.querySelectorAll('.paper-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const row = trigger.closest('.paper-row');
+        const isOpen = row.classList.contains('open');
+        list.querySelectorAll('.paper-row.open').forEach(r => {
+          r.classList.remove('open');
+          r.querySelector('.paper-trigger').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
+          row.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
   }
 
-  // Enforced direct-download helper with graceful fallback
-  async function forceDownload(url, filename) {
-    try {
-      const res = await fetch(url, { mode: 'cors', cache: 'no-store' });
-      if (!res.ok) throw new Error('fetch');
-      const blob = await res.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = objectUrl;
-      a.download = filename || 'file.pdf';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(objectUrl);
-    } catch (_) {
-      // Fallback: try native download attribute
-      const a = document.createElement('a');
-      a.href = url;
-      a.setAttribute('download', filename || 'file.pdf');
-      a.rel = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-  }
-
-  // Row click & keyboard navigation -> GitHub blob
-  list.addEventListener('click', (e) => {
-    const saveLink = e.target.closest && e.target.closest('a.save');
-    if (saveLink) {
-      e.preventDefault();
-      forceDownload(saveLink.dataset.url, saveLink.dataset.name);
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    if (!query) {
+      render(allItems);
       return;
     }
-    const row = e.target.closest('li.row');
-    if (!row) return;
-    const url = row.getAttribute('data-href');
-    if (url) window.open(url, '_blank', 'noopener');
-  });
-
-  list.addEventListener('keydown', (e) => {
-    const row = e.target.closest && e.target.closest('li.row');
-    if (!row) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      const url = row.getAttribute('data-href');
-      if (url) window.open(url, '_blank', 'noopener');
-    }
+    const filtered = allItems.filter(f => {
+      const parsed = parseFileName(f.name);
+      if (!parsed) return false;
+      // Try to find meta by stripping leading zeros, then by raw sessionNum
+      const numKey = parsed.sessionNum.replace(/^0+/, '') || '0';
+      const meta = PAPER_META[numKey] || PAPER_META[parsed.sessionNum] || {};
+      const searchable = [
+        parsed.sessionNum, parsed.title, parsed.author, parsed.year,
+        meta.field || '', meta.themes || '', meta.summary || '', meta.readDate || ''
+      ].join(' ').toLowerCase();
+      return searchable.includes(query);
+    });
+    render(filtered);
   });
 
   try {
     const meta = await getRepoMeta();
     const branch = meta.default_branch || 'main';
-    const files = await getPDFs(branch);
-
-    document.getElementById('file-count').textContent = files.length;
-    document.getElementById('last-updated').textContent = formatDate(meta.pushed_at);
-
-    render(files);
-  } catch(e) {
-    list.innerHTML = '<li>Unable to load list.</li>';
+    const githubItems = await getPDFs(branch);
+    // Merge GitHub PDFs with extra papers not in the repo
+    allItems = [...githubItems, ...EXTRA_PAPERS]
+      .sort((a, b) => b.name.localeCompare(a.name, undefined, { sensitivity: 'base' }));
+    render(allItems);
+  } catch (e) {
+    list.innerHTML = '<li class="loading">Unable to load papers.</li>';
   }
 })();
 </script>
