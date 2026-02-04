@@ -6,6 +6,7 @@
   <title>Progress Reading Group</title>
   <meta name="description" content="Progress Reading Group (PRG) is a multidisciplinary reading group led by Benjamin Parry and Michelle Jia.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+  <script async src="https://cdn.seline.com/seline.js" data-token="de72bebc384e8ba"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
@@ -559,7 +560,7 @@
       const themes = meta.themes || '';
       const readDate = meta.readDate || '';
 
-      return `<li class="paper-row">
+      return `<li class="paper-row" data-title="${parsed.title}">
         <button class="paper-trigger" aria-expanded="false">
           <span class="paper-num mobile-hide">${parsed.sessionNum}</span>
           <span class="paper-trigger-text mobile-show">
@@ -589,11 +590,10 @@
                 <div class="detail-label">Read Date</div>
                 <div class="detail-value">${readDate}</div>
               </div>` : ''}
-              ${f.raw ? `<a href="${f.raw}" class="read-link" target="_blank" rel="noopener">
+              ${f.raw ? `<a href="${f.raw}" class="read-link" target="_blank" rel="noopener" data-title="${parsed.title}">
                 Read the full paper
                 <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6.392 11.21 5.37 10.2 8.92 6.648H0V5.17h8.92L5.37 1.625 6.391.608l5.301 5.301-5.3 5.301Z" fill="currentColor"/>
-                </svg>
               </a>` : ''}
             </div>
           </div>
@@ -612,6 +612,20 @@
         if (!isOpen) {
           row.classList.add('open');
           trigger.setAttribute('aria-expanded', 'true');
+          // Track paper expansion
+          const title = row.dataset.title;
+          if (title && window.seline) {
+            window.seline.track(title);
+          }
+        }
+      });
+    });
+
+    list.querySelectorAll('.read-link').forEach(link => {
+      link.addEventListener('click', () => {
+        const title = link.dataset.title;
+        if (title && window.seline) {
+          window.seline.track(`Link to ${title}`);
         }
       });
     });
